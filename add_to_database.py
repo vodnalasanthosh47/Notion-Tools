@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 import requests
+import json
 
 dotenv_path = 'secrets.env'
 load_dotenv(dotenv_path=dotenv_path)
@@ -18,23 +19,23 @@ def add_to_notion_database(page_data):
     return response.json()
 
 new_page_data = {
-    "parent": {"database_id": DATABASE_ID},
+    # "parent": {"database_id": DATABASE_ID},
     "properties": {
         "Imp Name": {
             "title": [
                 {
                     "text": {
-                        "content": "Trial 2"
+                        "content": "Trial 3"
                     }
                 }
             ]
         },
         "Crazy Number": {
-            "number": 49857
+            "number": 67865
         },
         "Options": {
             "select": {
-                "name": "Option 67"
+                "name": "Option 87"
             }
         }
     },
@@ -52,22 +53,13 @@ new_page_data = {
                     }
                 ]
             }
-        },
-        {
-            "object": "block",
-            "type": "heading_2",
-            "heading_2": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": "Subheading Example"
-                        }
-                    }
-                ]
-            }
         }
     ]
 }
 
-print(add_to_notion_database(new_page_data))
+response = add_to_notion_database(new_page_data)
+if response.get("object") != "error":
+    print("Page added successfully: ", response.get("id"))
+else:
+    print("Failed to add page:")
+    print(json.dumps(response, indent=2))
