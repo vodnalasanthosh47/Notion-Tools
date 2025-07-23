@@ -24,20 +24,50 @@ new_page_data = {
             "title": [
                 {
                     "text": {
-                        "content": "Trial 1"
+                        "content": "Trial 2"
                     }
                 }
             ]
         },
         "Crazy Number": {
-            "number": 1234
+            "number": 49857
         },
         "Options": {
             "select": {
-                "name": "Option 1"
+                "name": "Option 67"
             }
         }
-    }
+    },
+    "children": [
+        {
+            "object": "block",
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "This is a test paragraph."
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "object": "block",
+            "type": "heading_2",
+            "heading_2": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Subheading Example"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
 }
 
 print(add_to_notion_database(new_page_data))
