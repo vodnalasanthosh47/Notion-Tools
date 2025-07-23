@@ -42,16 +42,8 @@ new_page_data = {
     "children": [
         {
             "object": "block",
-            "type": "paragraph",
-            "paragraph": {
-                "rich_text": [
-                    {
-                        "type": "text",
-                        "text": {
-                            "content": "This is a test paragraph."
-                        }
-                    }
-                ]
+            "child_database": {
+                "title": "My database"
             }
         }
     ]
