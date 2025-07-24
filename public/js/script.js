@@ -38,7 +38,7 @@ function addCourse() {
               <div class="col-md-1 mb-3">
                 <label class="form-label notion-label">Emoji</label>
                 <input type="text" class="form-control notion-input emoji-input" 
-                       name="courses[${courseCount}][emoji]" placeholder="📖" maxlength="2">
+                       name="courses[${courseCount}][emoji]" maxlength="2">
               </div>
               <div class="col-md-5 mb-3">
                 <label class="form-label notion-label">Course Name</label>
@@ -88,22 +88,22 @@ function removeCourse(courseId) {
 }
 
 // Form submission handling
-document
-  .getElementById("semesterForm")
-  .addEventListener("submit", function (e) {
-    e.preventDefault();
+// document
+//   .getElementById("semesterForm")
+//   .addEventListener("submit", function (e) {
+//     e.preventDefault();
 
-    // Collect form data
-    const formData = new FormData(this);
-    const data = {};
+//     // Collect form data
+//     const formData = new FormData(this);
+//     const data = {};
 
-    // Convert FormData to a regular object
-    for (let [key, value] of formData.entries()) {
-      data[key] = value;
-    }
+//     // Convert FormData to a regular object
+//     for (let [key, value] of formData.entries()) {
+//       data[key] = value;
+//     }
 
-    console.log("Form data:", data);
+//     console.log("Form data:", data);
 
-    // Here you would typically send the data to your server
-    alert("Semester data collected! Check the console for details.");
-  });
+//     // Here you would typically send the data to your server
+//     alert("Semester data collected! Check the console for details.");
+//   });
