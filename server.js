@@ -20,18 +20,18 @@ app.use(morgan("dev"));
 app.use(express.static("public"));
 app.use(separatorMiddleware);
 
-app.get("/", (req, res) => {
+app.get("/add-semester", (req, res) => {
     res.sendFile(__dirname + "/public/add_semester.html");
 });
 
 app.post("/add-semester", (req, res) => {
     console.log("Received semester data:", req.body);
-    res.status(200).json(req.body);
+    res.render("added_semester.ejs", 
+                { semester_num: req.body.semester, num_courses: req.body.numCourses });
 });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
-  console.log(__dirname);
 });
 
 export default app;
