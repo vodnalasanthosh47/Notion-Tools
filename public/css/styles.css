@@ -1,0 +1,95 @@
+body {
+  background-color: #f7f7f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica,
+    "Apple Color Emoji", Arial, sans-serif;
+}
+.notion-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 60px 20px;
+}
+.notion-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #37352f;
+  margin-bottom: 2rem;
+  border: none;
+  background: transparent;
+  width: 100%;
+}
+.notion-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(15, 15, 15, 0.1);
+  border: 1px solid #e9e9e7;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+.notion-input {
+  border: 1px solid #e9e9e7;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 16px;
+  background: white;
+  transition: all 0.2s ease;
+}
+.notion-input:focus {
+  border-color: #2383e2;
+  box-shadow: 0 0 0 3px rgba(35, 131, 226, 0.1);
+  outline: none;
+}
+.notion-label {
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+.course-item {
+  border: 1px solid #e9e9e7;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  background: #fafafa;
+}
+.btn-notion {
+  background: #2383e2;
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn-notion:hover {
+  background: #1a6bb8;
+  color: white;
+}
+.btn-outline-notion {
+  border: 1px solid #e9e9e7;
+  color: #37352f;
+  background: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.btn-outline-notion:hover {
+  background: #f7f7f5;
+  border-color: #d9d9d7;
+  color: #37352f;
+}
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 1rem;
+}
+.form-text {
+  color: #787774;
+  font-size: 13px;
+}
+.emoji-input {
+  text-align: center;
+  font-size: 24px;
+  width: 60px;
+}

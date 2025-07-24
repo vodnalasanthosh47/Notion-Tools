@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "I am developing some tools for my Notion workspace by using the Notion API in order to optimize my time.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,5 +17,10 @@
   "bugs": {
     "url": "https://github.com/vodnalasanthosh47/Notion-Tools/issues"
   },
-  "homepage": "https://github.com/vodnalasanthosh47/Notion-Tools#readme"
+  "homepage": "https://github.com/vodnalasanthosh47/Notion-Tools#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1"
+  }
 }
