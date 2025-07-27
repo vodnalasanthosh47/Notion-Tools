@@ -8,7 +8,7 @@ const unsplash = createApi({
   fetch: nodeFetch,
 });
 
-unsplash.photos.getRandom({}).then(result => {
+unsplash.photos.getRandom({query: 'college study',}).then(result => {
   console.log(result);
 }).catch(error => {
   console.error(error);
