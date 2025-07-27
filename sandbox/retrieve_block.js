@@ -17,11 +17,13 @@ async function retriveBlockChildren(blockId) {
         block_id: blockId
     });
     console.log("Retrieved block children:");
-    response.results.forEach((block) => {
-        console.log(block.has_children ? "Block with children" : "Block without children");
-        console.log(block.type);
-        console.log("\n-----------------------------\n");
-    });
+    console.log(util.inspect(response.results, { depth: null, colors: true, compact: false }));
+
+    // response.results.forEach((block) => {
+    //     console.log(block.has_children ? "Block with children" : "Block without children");
+    //     console.log(block.type);
+    //     console.log("\n-----------------------------\n");
+    // });
 }
 
 async function retrieveDatabase(databaseId) {
@@ -38,4 +40,3 @@ async function queryDatabase(databaseId) {
     return response;
 }
 
-retriveBlockChildren(process.env.TEMPLATE_BLOCK_ID);
