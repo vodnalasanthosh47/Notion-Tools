@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "I am developing some tools for my Notion workspace by using the Notion API in order to optimize my time.",
   "main": "retrieve_block.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

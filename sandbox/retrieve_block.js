@@ -1,5 +1,7 @@
-require('dotenv').config({path: 'secrets.env'});
-const { Client } = require('@notionhq/client');
+import { Client } from "@notionhq/client";
+import dotenv from 'dotenv';
+dotenv.config({ path: './../secrets.env' });
+import util from 'util'; 
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -8,6 +10,18 @@ async function retrieveBlock(blockId) {
         block_id: blockId,
     });
     return response;
+}
+
+async function retriveBlockChildren(blockId) {
+    const response = await notion.blocks.children.list({
+        block_id: blockId
+    });
+    console.log("Retrieved block children:");
+    response.results.forEach((block) => {
+        console.log(block.has_children ? "Block with children" : "Block without children");
+        console.log(block.type);
+        console.log("\n-----------------------------\n");
+    });
 }
 
 async function retrieveDatabase(databaseId) {
@@ -24,23 +38,4 @@ async function queryDatabase(databaseId) {
     return response;
 }
 
-// retrieveBlock(process.env.DATABASE_ID).then(console.log).catch(console.error);
-// (async () => {
-//     try {
-//         const response = await retrieveDatabase(process.env.DATABASE_ID);
-//         console.log("Database retrieved successfully:", response);
-//     } catch (error) {
-//         console.error("Error retrieving database:", error);
-//     }
-// })();
-(async () => {
-    try {
-        const response = await queryDatabase(process.env.DATABASE_ID);
-        console.log("Database queried successfully:");
-        response.results.forEach((result) => {
-            console.log(result.properties);
-        });
-    } catch (error) {
-        console.error("Error querying database:", error);
-    }
-})();
+retriveBlockChildren(process.env.TEMPLATE_BLOCK_ID);
