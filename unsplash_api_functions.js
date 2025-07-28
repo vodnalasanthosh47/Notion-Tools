@@ -11,7 +11,7 @@ function createUnsplashClient() {
 }
 
 export async function getRandomImage(query = 'college study') {
-    // const unsplash = createUnsplashClient();
+    const unsplash = createUnsplashClient();
     try {
         const result = await unsplash.photos.getRandom({ query });
         return result.response.urls.regular;
@@ -19,7 +19,7 @@ export async function getRandomImage(query = 'college study') {
         console.error('Error fetching random image:', error);
         // return placeholder image
         console.log("\n-------------------\nReturning placeholder image due to error.");
-        return 'https://unsplash.com/photos/blurred-image-of-trees-with-orange-foliage-eJ2MY7Zp3i0';
+        return 'https://images.unsplash.com/photo-1753262081045-ff9b365ef62a?q=80&w=680&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
     }
 }
 
