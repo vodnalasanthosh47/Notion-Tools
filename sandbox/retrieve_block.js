@@ -40,3 +40,11 @@ async function queryDatabase(databaseId) {
     return response;
 }
 
+retriveBlockChildren('1f9a7488-60ab-80a8-91db-c532ceca1bd5')
+    .then((block) => {
+        console.log("Retrieved block:");
+        console.log(util.inspect(block, { depth: null, colors: true, compact: false }));
+    })
+    .catch((error) => { 
+        console.error("Error retrieving block:", error);
+    });

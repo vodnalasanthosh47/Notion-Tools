@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './secrets.env' });
 import util from 'util';
 import {getRandomImage} from './unsplash_api_functions.js';
+import { type } from 'os';
+import { get } from 'http';
 
 
 function createNotionClient() {
@@ -108,6 +110,63 @@ export async function createSemesterPage(semesterNumber, courses) {
     return semesterPageId;
 }
 
+async function createResultsDatabase(coursePageId, courseName) {
+    const notion = createNotionClient();
+    const resultsEmojis = ["📊", "📈", "📝", "🏅", "🎖️", "🏆", "🧩", "🗂️", "🗃️", "🧭", "*️⃣"];
+    var resultsDatabaseProperties = {
+        "Exam Name": {
+            "title": {},
+        },
+        "Exam Date": {
+            "date": {},
+        },
+        "Score": {
+            "number": {},
+        },
+        "Total Marks": {
+            "number": {},
+        },
+        "Weightage": {
+            "number": {},
+        },
+        "Effective Score": {
+            "formula": {
+                "expression": "prop('Score') / prop('Total Marks') * prop('Weightage')",
+            }
+        },
+        "Class Average": {
+            "number": {},
+        },
+        "Class Effective Score": {
+            "formula": {
+                "expression": "prop('Class Average') / prop('Total Marks') * prop('Weightage')"
+            }
+        }
+    };
+
+    const resultsDatabaseResponse = await notion.databases.create({
+        "parent": {
+            "type": "page_id",
+            "page_id": coursePageId,
+        },
+        "icon": {
+            "type": "emoji",
+            "emoji": resultsEmojis[Math.floor(Math.random() * resultsEmojis.length)],
+        },
+        "title": [
+            {
+                type: "text",
+                text: {
+                    content: `Results for ${courseName}`,
+                    link: null,
+                },
+            }
+        ],
+        "properties": resultsDatabaseProperties,
+        "is_inline": true,
+    });
+}
+
 export async function createCoursePage(semester_num, course) {
     var professorNames = course.professor.split(',').map(name => name.trim());
     var bucketingTags = course.bucketing.split(',').map(tag => tag.trim());
@@ -145,11 +204,219 @@ export async function createCoursePage(semester_num, course) {
             "multi_select": bucketingTags.map(tag => ({ "name": tag })),
         },
     };
+    var newCourseChildren = [
+        {
+            "type": "breadcrumb",
+            "breadcrumb": {}
+        },
+        {
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": []
+            }
+        },
+        {
+            "type": "toggle",
+            "toggle": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "TAs & Office Hours"
+                        }
+                    }
+                ],
+                children: [
+                    {
+                        "type": "paragraph",
+                        "paragraph": {
+                            "rich_text": [
+                                {
+                                    "type": "text",
+                                    "text": {
+                                        "content": "<Add TAs and Office Hours details here>"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": []
+            }
+        },
+        {
+            "type": "toggle",
+            "toggle": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Grading Scheme"
+                        }
+                    }
+                ],
+                "children": [
+                    {
+                        "type": "table",
+                        "table": {
+                            "table_width": 2,
+                            "has_column_header": true,
+                            "has_row_header": false,
+                            "children": [
+                                {
+                                    "type": "table_row",
+                                    "table_row": {
+                                        "cells": [
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": "Component"
+                                                    }
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": "Weightage"
+                                                    }
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "table_row",
+                                    "table_row": {
+                                        "cells": [
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": ""
+                                                    }
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": ""
+                                                    }
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "table_row",
+                                    "table_row": {
+                                        "cells": [
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": ""
+                                                    }
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": ""
+                                                    }
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "type": "table_row",
+                                    "table_row": {
+                                        "cells": [
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": ""
+                                                    }
+                                                }
+                                            ],
+                                            [
+                                                {
+                                                    "type": "text",
+                                                    "text": {
+                                                        "content": ""
+                                                    }
+                                                }
+                                            ]
+                                        ]
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": []
+            }
+        },
+        {
+            "type": "toggle",
+            "toggle": {
+                "rich_text": [
+                    {
+                        "type": "text",
+                        "text": {
+                            "content": "Grading"
+                        }
+                    }
+                ],
+                children: [
+                    {
+                        "type": "paragraph",
+                        "paragraph": {
+                            "rich_text": [
+                                {
+                                    "type": "text",
+                                    "text": {
+                                        "content": "<Add Grading details here>"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "paragraph",
+            "paragraph": {
+                "rich_text": []
+            }
+        },
+    ]
 
-    await createPage(process.env.ACADS_DATABASE_ID, true, newCourseProperties, [], await getRandomImage(course.name), course.emoji);
+    var newCoursePageResponse = await createPage(process.env.ACADS_DATABASE_ID, true, newCourseProperties, newCourseChildren, await getRandomImage(course.name), course.emoji);
+    var newCoursePageId = newCoursePageResponse.id;
+
+    // create a new database of results now
+    await createResultsDatabase(newCoursePageId, course.name);
 }
 
 // Testing
+//
 // console.log("Testing createPage function");
 // console.log(util.inspect(await createPage(process.env.DATABASE_ID, true, {}, [], "https://images.unsplash.com/photo-1686476846973-337a554eb274?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3ODM5MTR8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NTM2Nzk2MTB8&ixlib=rb-4.1.0&q=80&w=1080", "😶‍🌫️"), { depth: null, colors: true, compact: false }));
 // console.log("Testing createSemesterPage function");
