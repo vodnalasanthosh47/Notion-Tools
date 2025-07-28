@@ -90,6 +90,10 @@ body {
 }
 .emoji-input {
   text-align: center;
-  font-size: 24px;
+  font-size: 21px;
+  padding-left: 8px;
+  padding-right: 8px;
+  padding-top: 6px;
+  padding-bottom: 10px;
   width: 60px;
 }

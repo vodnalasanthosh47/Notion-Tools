@@ -439,24 +439,24 @@ export async function createCoursePage(semester_num, course) {
 //     }
 //   ]);
 
-var courses = [
-    {
-      "emoji": "⬆️",
-      "name": "wjehbj ",
-      "code": "AGD56",
-      "credits": "4",
-      "professor": "Dinesh, Karthik",
-      "bucketing": "Theory, Systems"
-    },
-    {
-      "emoji": "😊",
-      "name": "sr;khg ",
-      "code": "W47H",
-      "credits": "1",
-      "professor": "Harish",
-      "bucketing": "Systems"
-    }
-];
-courses.forEach(async course => {
-    await createCoursePage(5, course);
-});
+// var courses = [
+//     {
+//       "emoji": "⬆️",
+//       "name": "wjehbj ",
+//       "code": "AGD56",
+//       "credits": "4",
+//       "professor": "Dinesh, Karthik",
+//       "bucketing": "Theory, Systems"
+//     },
+//     {
+//       "emoji": "😊",
+//       "name": "sr;khg ",
+//       "code": "W47H",
+//       "credits": "1",
+//       "professor": "Harish",
+//       "bucketing": "Systems"
+//     }
+// ];
+// courses.forEach(async course => {
+//     await createCoursePage(5, course);
+// });

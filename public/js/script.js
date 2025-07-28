@@ -38,7 +38,7 @@ function addCourse() {
               <div class="col-md-1 mb-3">
                 <label class="form-label notion-label">Emoji</label>
                 <input type="text" class="form-control notion-input emoji-input" 
-                       name="courses[${courseCount}][emoji]" maxlength="2">
+                       name="courses[${courseCount}][emoji]" maxlength="2" value="📚">
               </div>
               <div class="col-md-5 mb-3">
                 <label class="form-label notion-label">Course Name</label>
@@ -53,7 +53,7 @@ function addCourse() {
               <div class="col-md-3 mb-3">
                 <label class="form-label notion-label">Credits</label>
                 <input type="number" class="form-control notion-input" 
-                       name="courses[${courseCount}][credits]" min="1" max="6" required>
+                       name="courses[${courseCount}][credits]" min="1" max="6"  value="4" required>
               </div>
             </div>
             
@@ -67,7 +67,6 @@ function addCourse() {
                 <label class="form-label notion-label">Bucketing</label>
                 <input type="text" class="form-control notion-input" 
                        name="courses[${courseCount}][bucketing]">
-                <div class="form-text">Course category or classification</div>
               </div>
             </div>
           </div>
