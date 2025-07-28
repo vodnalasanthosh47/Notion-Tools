@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import { dirname, sep } from "path";
 import { fileURLToPath } from "url";
-import { test_console_log } from "./notion_api_functions.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -33,6 +32,5 @@ app.post("/add-semester", (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
-  test_console_log();
 });
 
