@@ -56,6 +56,11 @@ export async function createPage(parentId, isParentADatabase, properties, childr
 
         // creating the page
         const response = await notion.pages.create(newPage);
+        console.log("Response from Notion API:", util.inspect(response, { depth: null, colors: true, compact: false }));
+        // Need to check if response is 200
+        // if (!response || !response.id) {
+        //     throw new Error("Failed to create page, response did not contain an ID.");
+        // }
         return response;
     } catch (error) {
         console.error('Error creating page:', error);
@@ -78,113 +83,124 @@ export async function appendBlockChildren(blockId, children) {
 }
 
 export async function createSemesterPage(semesterNumber, courses) {
-    const numberEmojis = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
-    console.log(numberEmojis[semesterNumber] + "\n\n-----------\n");
-    var newSemesterProperties = {
-        'Semester': {
-            "title": [
-                {
-                    "text": {
-                        "content": `Semester ${semesterNumber}`,
+    try {
+        const numberEmojis = ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
+        console.log(numberEmojis[semesterNumber] + "\n\n-----------\n");
+        var newSemesterProperties = {
+            'Semester': {
+                "title": [
+                    {
+                        "text": {
+                            "content": `Semester ${semesterNumber}`,
+                        },
                     },
-                },
-            ],
-        },
-        'Number of Courses': {
-            "number": courses.length,
-        },
-        'Credits': {
-            "number": courses.reduce((total, course) => total + (Number(course.credits) || 0), 0),
-        }
-    };
+                ],
+            },
+            'Number of Courses': {
+                "number": courses.length,
+            },
+            'Credits': {
+                "number": courses.reduce((total, course) => total + (Number(course.credits) || 0), 0),
+            }
+        };
 
-    var createPageResponse = await createPage(
-        process.env.SEMESTER_VIEW_DATABASE_ID,
-        true,
-        newSemesterProperties,
-        [],
-        await getRandomImage(),
-        numberEmojis[semesterNumber]
-    );
-    var semesterPageId = createPageResponse.id;
-    return semesterPageId;
+        var createPageResponse = await createPage(
+            process.env.SEMESTER_VIEW_DATABASE_ID,
+            true,
+            newSemesterProperties,
+            [],
+            await getRandomImage(),
+            numberEmojis[semesterNumber]
+        );
+        
+        if (!createPageResponse || !createPageResponse.id) {
+            throw new Error("Failed to create semester page, response did not contain an ID.");
+        }
+
+        var semesterPageId = createPageResponse.id;
+        return semesterPageId;
+    } catch (error) {
+        console.error('Error creating semester page:', error);
+        throw error;
+    }
 }
 
 async function createResultsDatabase(coursePageId, courseName) {
     const notion = createNotionClient();
-    const resultsEmojis = ["📊", "📈", "📝", "🏅", "🎖️", "🏆", "🧩", "🗂️", "🗃️", "🧭", "*️⃣"];
-    var resultsDatabaseProperties = {
-        "Exam Name": {
-            "title": {},
-        },
-        "Exam Date": {
-            "date": {},
-        },
-        "Score": {
-            "number": {},
-        },
-        "Total Marks": {
-            "number": {},
-        },
-        "Weightage": {
-            "number": {},
-        },
-        "Effective Score": {
-            "formula": {
-                "expression": "prop('Score') / prop('Total Marks') * prop('Weightage')",
+    try {
+        const resultsEmojis = ["📊", "📈", "📝", "🏅", "🎖️", "🏆", "🧩", "🗂️", "🗃️", "🧭", "*️⃣"];
+        var resultsDatabaseProperties = {
+            "Exam Name": {
+                "title": {},
+            },
+            "Exam Date": {
+                "date": {},
+            },
+            "Score": {
+                "number": {},
+            },
+            "Total Marks": {
+                "number": {},
+            },
+            "Weightage": {
+                "number": {},
+            },
+            "Effective Score": {
+                "formula": {
+                    "expression": "prop('Score') / prop('Total Marks') * prop('Weightage')",
+                }
+            },
+            "Class Average": {
+                "number": {},
+            },
+            "Class Effective Score": {
+                "formula": {
+                    "expression": "prop('Class Average') / prop('Total Marks') * prop('Weightage')"
+                }
             }
-        },
-        "Class Average": {
-            "number": {},
-        },
-        "Class Effective Score": {
-            "formula": {
-                "expression": "prop('Class Average') / prop('Total Marks') * prop('Weightage')"
-            }
-        }
-    };
+        };
 
-    const resultsDatabaseResponse = await notion.databases.create({
-        "parent": {
-            "type": "page_id",
-            "page_id": coursePageId,
-        },
-        "icon": {
-            "type": "emoji",
-            "emoji": resultsEmojis[Math.floor(Math.random() * resultsEmojis.length)],
-        },
-        "title": [
-            {
-                type: "text",
-                text: {
-                    content: `Results for ${courseName}`,
-                    link: null,
-                },
-            }
-        ],
-        "properties": resultsDatabaseProperties,
-        "is_inline": true,
-    });
+        const resultsDatabaseResponse = await notion.databases.create({
+            "parent": {
+                "type": "page_id",
+                "page_id": coursePageId,
+            },
+            "icon": {
+                "type": "emoji",
+                "emoji": resultsEmojis[Math.floor(Math.random() * resultsEmojis.length)],
+            },
+            "title": [
+                {
+                    type: "text",
+                    text: {
+                        content: `Results for ${courseName}`,
+                        link: null,
+                    },
+                }
+            ],
+            "properties": resultsDatabaseProperties,
+            "is_inline": true,
+        });
+
+        if (!resultsDatabaseResponse) {
+            throw new Error("Failed to create results database.");
+        }
+    } catch (error) {
+        console.error(`Error creating results database for ${courseName}:`, error);
+        throw error;
+    }
 }
 
 export async function createCoursePage(semester_num, course) {
     var professorNames = course.professor.split(',').map(name => name.trim());
     var bucketingTags = course.bucketing.split(',').map(tag => tag.trim());
+    
     var newCourseProperties = {
         'Course Name': {
             "title": [
                 {
                     "text": {
                         "content": course.name,
-                    },
-                },
-            ],
-        },
-        'Course Code': {
-            "rich_text": [
-                {
-                    "text": {
-                        "content": course.code,
                     },
                 },
             ],
@@ -196,14 +212,30 @@ export async function createCoursePage(semester_num, course) {
             "select": {
                 "name": `Semester ${semester_num}`,
             }
-        },
-        'Instructor Name': {
-            "multi_select": professorNames.map(name => ({ "name": name })),
-        },
-        'Bucketing': {
-            "multi_select": bucketingTags.map(tag => ({ "name": tag })),
-        },
+        }
     };
+    if (course.code.length ) {
+        newCourseProperties['Course Code'] = {
+            "rich_text": [
+                {
+                    "text": {
+                        "content": course.code,
+                    },
+                },
+            ],
+        };
+    }
+    if (professorNames[0] != "") {
+        newCourseProperties['Professor'] = {
+            "multi_select": professorNames.map(name => ({ "name": name })),
+        };
+    }
+    if (bucketingTags[0] != "") {
+        newCourseProperties['Bucketing'] = {
+            "multi_select": bucketingTags.map(tag => ({ "name": tag })),
+        };
+    }
+    
     var newCourseChildren = [
         {
             "type": "breadcrumb",
