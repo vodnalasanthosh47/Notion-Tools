@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import { dirname, sep } from "path";
 import { fileURLToPath } from "url";
-import { createSemesterPage, createCoursePage } from "./notion_api_functions.js";
+import { createSemesterPage, createCoursePage, checkIfSemesterExists } from "./notion_api_functions.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -29,10 +29,24 @@ app.get("/add-semester", (req, res) => {
     res.sendFile(__dirname + "/public/add_semester.html");
 });
 
-app.post("/add-semester", (req, res) => {
+app.post("/add-semester", async (req, res) => {
     console.log("Received semester data:", req.body);
+
     // task 1: create a new semester page in Notion
-    createSemesterPage(req.body.semester, req.body.courses);
+    try {
+        // Check if the semester already exists
+        const semesterExists = await checkIfSemesterExists(req.body.semester);
+        if (!semesterExists) {
+            await createSemesterPage(req.body.semester, req.body.courses);
+        }
+        else {
+            console.log(`Semester ${req.body.semester} already exists. Not creating a new semester page.`);
+        }
+    }
+    catch (error) {
+        console.error('Error adding semester:', error);
+        return res.status(500).send("Internal Server Error");
+    }
 
     // task 2: create course pages in Notion
     req.body.courses.forEach(course => {

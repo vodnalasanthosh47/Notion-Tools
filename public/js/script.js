@@ -6,9 +6,9 @@ document.getElementById("numCourses").addEventListener("change", function () {
   updateCourses(numCourses);
 });
 
-// Initialize with 4 courses by default
+// Initialize with 1 courses by default
 document.addEventListener("DOMContentLoaded", function () {
-  updateCourses(4);
+  updateCourses(1);
 });
 
 function updateCourses(numCourses) {
@@ -48,7 +48,7 @@ function addCourse() {
               <div class="col-md-3 mb-3">
                 <label class="form-label notion-label">Course Code</label>
                 <input type="text" class="form-control notion-input" 
-                       name="courses[${courseCount}][code]" required>
+                       name="courses[${courseCount}][code]">
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label notion-label">Credits</label>

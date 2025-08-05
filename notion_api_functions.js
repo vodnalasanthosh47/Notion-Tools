@@ -11,6 +11,27 @@ function createNotionClient() {
     return new Client({ auth: process.env.NOTION_API_KEY });
 }
 
+export async function checkIfSemesterExists(semesterNumber) {
+    const notion = createNotionClient();
+    try {
+        const response = await notion.databases.query({
+            database_id: process.env.SEMESTER_VIEW_DATABASE_ID,
+            filter: {
+                property: 'Semester',
+                title: {
+                    equals: `Semester ${semesterNumber}`,
+                },
+            },
+        });
+        // console.log("Response from Notion API for checking semester existence:", util.inspect(response, { depth: null, colors: true, compact: false }));
+        return response.results.length > 0;
+    }
+    catch (error) {
+        console.error('Error checking if semester exists:', error);
+        throw error;
+    }
+}
+
 export async function createPage(parentId, isParentADatabase, properties, children, coverImageUrl = null, iconEmoji = null) {
     const notion = createNotionClient();
     try {
@@ -492,3 +513,5 @@ export async function createCoursePage(semester_num, course) {
 // courses.forEach(async course => {
 //     await createCoursePage(5, course);
 // });
+
+// checkIfSemesterExists(6);
