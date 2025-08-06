@@ -7,14 +7,16 @@ import { type } from 'os';
 import { get } from 'http';
 
 
-function createNotionClient() {
+export function createNotionClient() {
     return new Client({ auth: process.env.NOTION_API_KEY });
 }
 
-export async function checkIfSemesterExists(semesterNumber) {
-    const notion = createNotionClient();
+export async function checkIfSemesterExists(semesterNumber, notionClient = null) {
+    if (!notionClient) {
+        notionClient = createNotionClient();
+    }
     try {
-        const response = await notion.databases.query({
+        const response = await notionClient.databases.query({
             database_id: process.env.SEMESTER_VIEW_DATABASE_ID,
             filter: {
                 property: 'Semester',
@@ -32,8 +34,10 @@ export async function checkIfSemesterExists(semesterNumber) {
     }
 }
 
-export async function createPage(parentId, isParentADatabase, properties, children, coverImageUrl = null, iconEmoji = null) {
-    const notion = createNotionClient();
+export async function createPage(parentId, isParentADatabase, properties, children, coverImageUrl = null, iconEmoji = null, notionClient = null) {
+    if (!notionClient) {
+        notionClient = createNotionClient();
+    }
     try {
         var newPage = {};
         // adding cover and icon only if they are provided
@@ -76,7 +80,7 @@ export async function createPage(parentId, isParentADatabase, properties, childr
         // console.log("\n-----\n\n")
 
         // creating the page
-        const response = await notion.pages.create(newPage);
+        const response = await notionClient.pages.create(newPage);
         console.log("Response from Notion API:", util.inspect(response, { depth: null, colors: true, compact: false }));
         // Need to check if response is 200
         // if (!response || !response.id) {
@@ -89,10 +93,12 @@ export async function createPage(parentId, isParentADatabase, properties, childr
     }
 }
 
-export async function appendBlockChildren(blockId, children) {
-    const notion = createNotionClient();
+export async function appendBlockChildren(blockId, children, notionClient = null) {
+    if (!notionClient) {
+        notionClient = createNotionClient();
+    }
     try {
-        const response = await notion.blocks.children.append({
+        const response = await notionClient.blocks.children.append({
             block_id: blockId,
             children: children,
         });
@@ -146,8 +152,10 @@ export async function createSemesterPage(semesterNumber, courses) {
     }
 }
 
-async function createResultsDatabase(coursePageId, courseName) {
-    const notion = createNotionClient();
+async function createResultsDatabase(coursePageId, courseName, notionClient = null) {
+    if (!notionClient) {
+        notionClient = createNotionClient();
+    }
     try {
         const resultsEmojis = ["📊", "📈", "📝", "🏅", "🎖️", "🏆", "🧩", "🗂️", "🗃️", "🧭", "*️⃣"];
         var resultsDatabaseProperties = {
@@ -181,7 +189,7 @@ async function createResultsDatabase(coursePageId, courseName) {
             }
         };
 
-        const resultsDatabaseResponse = await notion.databases.create({
+        const resultsDatabaseResponse = await notionClient.databases.create({
             "parent": {
                 "type": "page_id",
                 "page_id": coursePageId,
@@ -235,7 +243,7 @@ export async function createCoursePage(semester_num, course) {
             }
         }
     };
-    if (course.code.length ) {
+    if (course.code.length > 0) {
         newCourseProperties['Course Code'] = {
             "rich_text": [
                 {
@@ -247,7 +255,7 @@ export async function createCoursePage(semester_num, course) {
         };
     }
     if (professorNames[0] != "") {
-        newCourseProperties['Professor'] = {
+        newCourseProperties['Instructor Name'] = {
             "multi_select": professorNames.map(name => ({ "name": name })),
         };
     }

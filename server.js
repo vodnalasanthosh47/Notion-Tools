@@ -3,12 +3,13 @@ import bodyParser from "body-parser";
 import morgan from "morgan";
 import { dirname, sep } from "path";
 import { fileURLToPath } from "url";
-import { createSemesterPage, createCoursePage, checkIfSemesterExists } from "./notion_api_functions.js";
+import { createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient } from "./notion_api_functions.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
+const notionClient = createNotionClient();
 
 function separatorMiddleware(req, res, next) {
     console.log("\n\n----------------------------------------");
@@ -35,9 +36,9 @@ app.post("/add-semester", async (req, res) => {
     // task 1: create a new semester page in Notion
     try {
         // Check if the semester already exists
-        const semesterExists = await checkIfSemesterExists(req.body.semester);
+        const semesterExists = await checkIfSemesterExists(req.body.semester, notionClient);
         if (!semesterExists) {
-            await createSemesterPage(req.body.semester, req.body.courses);
+            await createSemesterPage(req.body.semester, req.body.courses, notionClient);
         }
         else {
             console.log(`Semester ${req.body.semester} already exists. Not creating a new semester page.`);
@@ -50,7 +51,7 @@ app.post("/add-semester", async (req, res) => {
 
     // task 2: create course pages in Notion
     req.body.courses.forEach(course => {
-        createCoursePage(req.body.semester, course);
+        createCoursePage(req.body.semester, course, notionClient);
     });
     // task 3: render a confirmation page
     res.render("added_semester.ejs", 
