@@ -31,14 +31,19 @@ app.get("/add-semester", (req, res) => {
 });
 
 app.post("/add-semester", async (req, res) => {
-    console.log("Received semester data:", req.body);
+    // defining error catching variables
+    var semesterAlreadyExists = false;
+    var semesterCreated = false;
+    var numCoursesAdded = 0;
+    var coursesAdded = [];
 
-    // task 1: create a new semester page in Notion
+    // task 1: create a semester page in Notion if it doesn't already exist
     try {
         // Check if the semester already exists
-        const semesterExists = await checkIfSemesterExists(req.body.semester, notionClient);
-        if (!semesterExists) {
+        semesterAlreadyExists = await checkIfSemesterExists(req.body.semester, notionClient);
+        if (!semesterAlreadyExists) {
             await createSemesterPage(req.body.semester, req.body.courses, notionClient);
+            semesterCreated = true;
         }
         else {
             console.log(`Semester ${req.body.semester} already exists. Not creating a new semester page.`);
@@ -46,16 +51,46 @@ app.post("/add-semester", async (req, res) => {
     }
     catch (error) {
         console.error('Error adding semester:', error);
-        return res.status(500).send("Internal Server Error");
+        return res.status(500).render("added_semester.ejs", 
+                                        {semesterAlreadyExists: false,
+                                        semesterCreated: false,
+                                        numCoursesAdded: 0,
+                                        numCoursesFailedToAdd: req.body.courses.length,
+                                        coursesAdded: [],
+                                        errorMessage: error.message
+                                        }
+        );
     }
 
     // task 2: create course pages in Notion
-    req.body.courses.forEach(course => {
-        createCoursePage(req.body.semester, course, notionClient);
-    });
+    try {
+        req.body.courses.forEach(course => {
+            createCoursePage(req.body.semester, course, notionClient);
+            numCoursesAdded++;
+            coursesAdded.push(course.name);
+        });
+    }
+    catch (error) {
+        console.error('Error adding courses:', error);
+        return res.status(500).render("added_semester.ejs",
+                                        {semesterAlreadyExists: semesterAlreadyExists,
+                                         semesterCreated: semesterCreated,
+                                         numCoursesAdded: numCoursesAdded,
+                                         numCoursesFailedToAdd: req.body.courses.length - numCoursesAdded,
+                                         coursesAdded: coursesAdded,
+                                         errorMessage: error.message
+                                        }
+        );
+    }
     // task 3: render a confirmation page
     res.render("added_semester.ejs", 
-                { semester_num: req.body.semester, num_courses: req.body.numCourses });
+                {semesterAlreadyExists: semesterAlreadyExists,
+                 semesterCreated: semesterCreated,
+                 numCoursesAdded: numCoursesAdded,
+                 numCoursesFailedToAdd: req.body.courses.length - numCoursesAdded,
+                 coursesAdded: coursesAdded,
+                 errorMessage: null
+                });
 });
 
 app.listen(port, () => {
