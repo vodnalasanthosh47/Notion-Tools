@@ -23,7 +23,8 @@ app.use(express.static("public"));
 app.use(separatorMiddleware);
 
 app.get("/", (req, res) => {
-    res.redirect("/add-semester");
+    console.log("Hello there");
+    res.render("index.ejs");
 });
 
 app.get("/add-semester", (req, res) => {
@@ -63,31 +64,35 @@ app.post("/add-semester", async (req, res) => {
     }
 
     // task 2: create course pages in Notion
-    try {
-        req.body.courses.forEach(course => {
-            createCoursePage(req.body.semester, course, notionClient);
-            numCoursesAdded++;
-            coursesAdded.push(course.name);
-        });
-    }
-    catch (error) {
-        console.error('Error adding courses:', error);
-        return res.status(500).render("added_semester.ejs",
-                                        {semesterAlreadyExists: semesterAlreadyExists,
-                                         semesterCreated: semesterCreated,
-                                         numCoursesAdded: numCoursesAdded,
-                                         numCoursesFailedToAdd: req.body.courses.length - numCoursesAdded,
-                                         coursesAdded: coursesAdded,
-                                         errorMessage: error.message
-                                        }
-        );
+    if (req.body.courses !== undefined) {
+        try {
+            console.log(req.body);
+            req.body.courses.forEach(course => {
+                createCoursePage(req.body.semester, course, notionClient);
+                numCoursesAdded++;
+                coursesAdded.push(course.name);
+            });
+        }
+        catch (error) {
+            console.error('Error adding courses:', error);
+            return res.status(500).render("added_semester.ejs",
+                                            {semesterAlreadyExists: semesterAlreadyExists,
+                                            semesterCreated: semesterCreated,
+                                            numCoursesAdded: numCoursesAdded,
+                                            numCoursesFailedToAdd: req.body.courses.length - numCoursesAdded,
+                                            coursesAdded: coursesAdded,
+                                            errorMessage: error.message
+                                            }
+            );
+        }
     }
     // task 3: render a confirmation page
+    var numCoursesSent = (req.body.courses === undefined) ? 0 : req.body.courses.length;
     res.render("added_semester.ejs", 
                 {semesterAlreadyExists: semesterAlreadyExists,
                  semesterCreated: semesterCreated,
                  numCoursesAdded: numCoursesAdded,
-                 numCoursesFailedToAdd: req.body.courses.length - numCoursesAdded,
+                 numCoursesFailedToAdd: numCoursesSent - numCoursesAdded,
                  coursesAdded: coursesAdded,
                  errorMessage: null
                 });

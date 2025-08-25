@@ -478,4 +478,3 @@ export async function createCoursePage(semester_num, course) {
 }
 
 // Testing
-createAcadsDatabasePage();
