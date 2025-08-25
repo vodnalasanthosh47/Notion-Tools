@@ -2,3 +2,4 @@ secrets.env
 test.py
 node_modules/
 sample_input.json
+sandbox/

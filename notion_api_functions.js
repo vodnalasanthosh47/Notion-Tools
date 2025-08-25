@@ -6,6 +6,7 @@ import {getRandomImage} from './unsplash_api_functions.js';
 import { type } from 'os';
 import { get } from 'http';
 
+const mainPageImage_URL = "https://images.unsplash.com/photo-1504805572947-34fad45aed93?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
 export function createNotionClient() {
     return new Client({ auth: process.env.NOTION_API_KEY });
@@ -477,49 +478,4 @@ export async function createCoursePage(semester_num, course) {
 }
 
 // Testing
-//
-// console.log("Testing createPage function");
-// console.log(util.inspect(await createPage(process.env.DATABASE_ID, true, {}, [], "https://images.unsplash.com/photo-1686476846973-337a554eb274?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3ODM5MTR8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NTM2Nzk2MTB8&ixlib=rb-4.1.0&q=80&w=1080", "😶‍🌫️"), { depth: null, colors: true, compact: false }));
-// console.log("Testing createSemesterPage function");
-// await createSemesterPage(5, [
-//     {
-//       "emoji": "⬆️",
-//       "name": "wjehbj ",
-//       "code": "AGD56",
-//       "credits": "4",
-//       "professor": "Dinesh, Karthik",
-//       "bucketing": "Theory, Systems"
-//     },
-//     {
-//       "emoji": "😊",
-//       "name": "sr;khg ",
-//       "code": "W47H",
-//       "credits": "1",
-//       "professor": "Harish",
-//       "bucketing": "Systems"
-//     }
-//   ]);
-
-// var courses = [
-//     {
-//       "emoji": "⬆️",
-//       "name": "wjehbj ",
-//       "code": "AGD56",
-//       "credits": "4",
-//       "professor": "Dinesh, Karthik",
-//       "bucketing": "Theory, Systems"
-//     },
-//     {
-//       "emoji": "😊",
-//       "name": "sr;khg ",
-//       "code": "W47H",
-//       "credits": "1",
-//       "professor": "Harish",
-//       "bucketing": "Systems"
-//     }
-// ];
-// courses.forEach(async course => {
-//     await createCoursePage(5, course);
-// });
-
-// checkIfSemesterExists(6);
+createAcadsDatabasePage();
