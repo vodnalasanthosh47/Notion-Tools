@@ -489,7 +489,13 @@ export async function extractAcads_and_Semester_PageIDs(notion_page_link, notinC
 
     if (!notinClient) notinClient = createNotionClient();
 
-    const response = await notinClient.blocks.children.list({ block_id: parentPageID });
+    try {
+        const response = await notinClient.blocks.children.list({ block_id: parentPageID });
+    } catch (error) {
+        console.error("Error fetching child blocks:", error);
+        throw new Error("Failed to get database IDs. It might occur if you have provided an invalid Notion page link or you have not given the proper Notion Integration key with proper access.");
+    }
+    
 
     var pageIDs = [];
     response.results.forEach( (object) => {
@@ -501,7 +507,6 @@ export async function extractAcads_and_Semester_PageIDs(notion_page_link, notinC
     if (pageIDs.length !== 2) {
         throw new Error("Expected 2 child database IDs");
     }
-    console.log("Extracted Academic Database and Semester View Database IDs:", pageIDs);
     return pageIDs;
 }
 
