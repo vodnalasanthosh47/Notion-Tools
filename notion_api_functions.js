@@ -222,6 +222,7 @@ async function createResultsDatabase(coursePageId, courseName, notionClient = nu
 }
 
 export async function createCoursePage(semester_num, course) {
+    // returns true if page is created, else false
     var professorNames = course.professor.split(',').map(name => name.trim());
     var bucketingTags = course.bucketing.split(',').map(tag => tag.trim());
     
@@ -471,10 +472,14 @@ export async function createCoursePage(semester_num, course) {
     ]
 
     var newCoursePageResponse = await createPage(process.env.ACADS_DATABASE_ID, true, newCourseProperties, newCourseChildren, await getRandomImage(course.name), course.emoji);
+    if (!newCoursePageResponse || !newCoursePageResponse.id) {
+        return false;
+    }
     var newCoursePageId = newCoursePageResponse.id;
 
     // create a new database of results now
     await createResultsDatabase(newCoursePageId, course.name);
+    return true;
 }
 
 // Testing

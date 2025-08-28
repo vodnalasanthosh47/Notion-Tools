@@ -1,5 +1,4 @@
 import express from "express";
-import bodyParser from "body-parser";
 import morgan from "morgan";
 import { dirname, sep } from "path";
 import { fileURLToPath } from "url";
@@ -63,28 +62,23 @@ app.post("/add-semester", async (req, res) => {
         );
     }
 
+    var errorMessages = [];
+
     // task 2: create course pages in Notion
     if (req.body.courses !== undefined) {
-        try {
-            console.log(req.body);
-            req.body.courses.forEach(course => {
-                createCoursePage(req.body.semester, course, notionClient);
-                numCoursesAdded++;
-                coursesAdded.push(course.name);
-            });
-        }
-        catch (error) {
-            console.error('Error adding courses:', error);
-            return res.status(500).render("added_semester.ejs",
-                                            {semesterAlreadyExists: semesterAlreadyExists,
-                                            semesterCreated: semesterCreated,
-                                            numCoursesAdded: numCoursesAdded,
-                                            numCoursesFailedToAdd: req.body.courses.length - numCoursesAdded,
-                                            coursesAdded: coursesAdded,
-                                            errorMessage: error.message
-                                            }
-            );
-        }
+        console.log(req.body);
+        req.body.courses.forEach(course => {
+            try {
+                var isPageCreated = createCoursePage(req.body.semester, course, notionClient);
+                if (isPageCreated) {
+                    numCoursesAdded++;
+                    coursesAdded.push(course.name);
+                }
+            } catch (error) {
+                console.error('Error creating course page of ' + course.name + ':', error);
+                errorMessages.push('Error creating course page of ' + course.name + ': ' + error.message);
+            }
+        });
     }
     // task 3: render a confirmation page
     var numCoursesSent = (req.body.courses === undefined) ? 0 : req.body.courses.length;
@@ -94,7 +88,7 @@ app.post("/add-semester", async (req, res) => {
                  numCoursesAdded: numCoursesAdded,
                  numCoursesFailedToAdd: numCoursesSent - numCoursesAdded,
                  coursesAdded: coursesAdded,
-                 errorMessage: null
+                 errorMessage: errorMessages.join(';\n')
                 });
 });
 

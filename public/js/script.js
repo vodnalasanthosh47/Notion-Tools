@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function updateCourses(numCourses) {
+  const prevData = getCoursesData();
   const container = document.getElementById("coursesContainer");
   container.innerHTML = "";
   courseCount = 0;
@@ -19,6 +20,33 @@ function updateCourses(numCourses) {
   for (let i = 0; i < numCourses; i++) {
     addCourse();
   }
+  restoreCoursesData(prevData);
+}
+function getCoursesData() {
+  const courses = [];
+  document.querySelectorAll(".course-item").forEach((item, idx) => {
+    const emoji = item.querySelector(".emoji-input")?.value || "";
+    const name = item.querySelector('input[name^="courses"][name$="[name]"]')?.value || "";
+    const code = item.querySelector('input[name^="courses"][name$="[code]"]')?.value || "";
+    const credits = item.querySelector('input[name^="courses"][name$="[credits]"]')?.value || "";
+    const professor = item.querySelector('input[name^="courses"][name$="[professor]"]')?.value || "";
+    const bucketing = item.querySelector('input[name^="courses"][name$="[bucketing]"]')?.value || "";
+    courses.push({ emoji, name, code, credits, professor, bucketing });
+  });
+  return courses;
+}
+
+function restoreCoursesData(courses) {
+  document.querySelectorAll(".course-item").forEach((item, idx) => {
+    if (courses[idx]) {
+      item.querySelector(".emoji-input").value = courses[idx].emoji;
+      item.querySelector('input[name^="courses"][name$="[name]"]').value = courses[idx].name;
+      item.querySelector('input[name^="courses"][name$="[code]"]').value = courses[idx].code;
+      item.querySelector('input[name^="courses"][name$="[credits]"]').value = courses[idx].credits;
+      item.querySelector('input[name^="courses"][name$="[professor]"]').value = courses[idx].professor;
+      item.querySelector('input[name^="courses"][name$="[bucketing]"]').value = courses[idx].bucketing;
+    }
+  });
 }
 
 function addCourse() {
