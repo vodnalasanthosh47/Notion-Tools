@@ -482,4 +482,27 @@ export async function createCoursePage(semester_num, course) {
     return true;
 }
 
+export async function extractAcads_and_Semester_PageIDs(notion_page_link, notinClient = null) {
+    var link_split = notion_page_link.split('/');
+    var link_split_end = link_split[link_split.length - 1].split('-');
+    var parentPageID = link_split_end[link_split_end.length - 1];
+
+    if (!notinClient) notinClient = createNotionClient();
+
+    const response = await notinClient.blocks.children.list({ block_id: parentPageID });
+
+    var pageIDs = [];
+    response.results.forEach( (object) => {
+        if (object.type === 'child_database') {
+            pageIDs.push(object.id);
+        }
+    });
+    // pageIDs length must be 2
+    if (pageIDs.length !== 2) {
+        throw new Error("Expected 2 child database IDs");
+    }
+    console.log("Extracted Academic Database and Semester View Database IDs:", pageIDs);
+    return pageIDs;
+}
+
 // Testing
