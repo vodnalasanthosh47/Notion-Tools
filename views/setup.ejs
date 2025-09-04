@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <title>Home Page - Notion Tools</title>
+  </head>
+  <body>
+    <div class="notion-container">
+      <h1 class="notion-title">Welcome to Notion Tools!</h1>
+      <p>
+        Your all-in-one solution for managing your Notion databases with ease.
+      </p>
+
+      <div class="notion-card">
+        <h2 class="section-title">📐 Setup Process</h2>
+        <hr>
+
+        <div class="setup-step">
+          <h3 class="setup-title">Step 1: Duplicate Academic Database Template</h3>
+          <p class="setup-text">
+            To get started, duplicate the <a href="https://vodnalasanthosh47.notion.site/Academic-Database-Template-259a748860ab8052835df736bb06e4d6?source=copy_link"> academic database template</a> into your Notion workspace.
+            Just follow the link, login, and click on the duplicate icon in the top right corner. Then 
+          </p>
+          <video class="setup-image" controls>
+              <source src="./images/Notion_Tools_Duplicate_Template.mp4" type="video/mp4">
+          </video> 
+        </div>
+
+        <div class="setup-step">
+          <h3 class="setup-title">Step 2: Setting up a Notion Integration</h3>
+          <p class="setup-text">
+            Next, create a Notion integration to allow this app to access your Notion workspace. 
+            <ol>
+              <li>Go to <a href="https://www.notion.so/my-integrations" target="_blank">Notion Integrations</a></li>
+              <li>
+                Click on "New Integration"
+                <img src="./images/Notion_Create_new_integration.png" alt="Create New Integration" class="setup-image"/>
+              </li>
+              <li>
+                Give your integration a name and select the workspace you want to connect it to. The type of integration should be "Internal". Click "Save" to create it.
+                <img src="./images/Notion_New_integration_form.png" alt="New Integration Form" class="setup-image"/>
+              </li>
+              <li>
+                In the "Access", click on "Edit access", then under "Private", select the "Academic Database".
+                <img src="./images/Notion_Integration_Access.png" alt="Integration Access" class="setup-image"/>
+              </li>
+              <li>In the "Configuration" tab, you can see the "Internal Integration Secret". Save that for the next step.</li>
+            </ol>
+          </p>
+          <br>
+          <p class="setup-text">
+            <i>Optional:</i> You can also make an <a href="https://unsplash.com/developers" target="_blank">Unsplash API key</a> to fetch random images for your courses. This would make the pages created look more customised to the page title. 
+          </p>
+        </div>
+
+        <div class="setup-step" id="setup-form">
+          <h3 class="setup-title">Step 3: Set up environment variables</h3>
+          <p class="setup-text">
+            Provide the API keys and a link to your Notion Acads Database Template.
+            If you are using notion on the browser, you can get the link from the URL bar.
+            If you are using the desktop app, right click on the page in the sidebar and click "Copy Link".
+          </p>
+          
+          <form action="/setup" method="post" class="setup-form">
+            <div class="mb-3">
+              <label for="notionToken" class="form-label">Notion Integration Token <em style="color: rgb(160, 16, 16);">(Required)</em></label>
+              <input type="text" class="form-control" id="notionToken" name="notionToken" required />
+            </div>
+            <div class="mb-3">
+              <label for="notionDatabaseLink" class="form-label">Notion Database Link <em style="color: rgb(160, 16, 16);">(Required)</em></label>
+              <input type="text" class="form-control" id="notionDatabaseLink" name="notionDatabaseLink" required />
+            </div>
+            <div class="mb-3">
+              <label for="unsplashAccessKey" class="form-label">Unsplash Access Key<i style="color: sandybrown;">(Optional)</i></label>
+              <input type="text" class="form-control" id="unsplashAccessKey" name="unsplashAccessKey" />
+            </div>
+            <div class="mb-3">
+              <label for="unsplashSecretKey" class="form-label">Unsplash Secret Key<i style="color: sandybrown;">(Optional)</i></label>
+              <input type="text" class="form-control" id="unsplashSecretKey" name="unsplashSecretKey" />
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
+
+          <% if (locals.isFormSuccessful) { %>
+           <% if (isFormSuccessful) { %>
+              <div class="alert alert-success setup-form-alert" role="alert">
+                ✅ API keys saved successfully!
+              </div>
+            <% } else { %>
+            <div class="alert alert-danger setup-form-alert" role="alert">
+                👎 Failed to save API keys. Please check your Notion Database Link and try again.
+              </div>
+           <% } %>
+           
+          <% } %>   
+        </div>
+
+      </div>
+  </body>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-4cmjXxw+YH6v0g5F8FvH8fQ9l+2e7m5g5h5j5j5j5j5j5j5j5j5j5j5j5j5j5j5"
+      crossorigin="anonymous"
+    ></script>
+    <script src="./js/welcome_script.js"></script>
+</html>

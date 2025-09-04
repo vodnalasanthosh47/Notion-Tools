@@ -64,6 +64,10 @@ body {
   background: #1a6bb8;
   color: white;
 }
+.btn-notion:disabled {
+  background: #b0d4f1;
+  cursor: not-allowed;
+}
 .btn-outline-notion {
   border: 1px solid #e9e9e7;
   color: #37352f;
@@ -96,4 +100,54 @@ body {
   padding-top: 6px;
   padding-bottom: 10px;
   width: 60px;
+}
+.setup-step {
+  margin-bottom: 2rem;
+}
+.setup-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #37352f;
+  margin-bottom: 1rem;
+}
+.setup-text {
+  font-size: 1rem;
+  color: #4f4c44;
+}
+.setup-image {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  transition: border-radius 0.3s ease;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 4px solid #e9e9e9;
+}
+.setup-image:hover {
+  border-radius: 4px;
+  border: 4px solid #dddddd;
+}
+.setup-form {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 36px;
+  padding-right: 36px;
+}
+.setup-form-alert {
+  padding-left: 18px;
+  padding-right: 18px;
+  margin-left: 36px;
+  margin-right: 36px;
+}
+a {
+  color: #2383e2;
+  font-weight: 600;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+hr {
+  margin-bottom: 24px;
 }

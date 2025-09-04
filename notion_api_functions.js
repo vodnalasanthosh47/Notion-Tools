@@ -94,6 +94,19 @@ export async function createPage(parentId, isParentADatabase, properties, childr
     }
 }
 
+export async function getBlockChildren(parentId, notionClient = null) {
+    if (!notionClient) notionClient = createNotionClient();
+    try {
+        const response = await notionClient.blocks.children.list({
+            block_id: parentId,
+        });
+        return response.results;
+    } catch (error) {
+        console.error('Error fetching block children:', error);
+        throw error;
+    }
+}
+
 export async function appendBlockChildren(blockId, children, notionClient = null) {
     if (!notionClient) {
         notionClient = createNotionClient();

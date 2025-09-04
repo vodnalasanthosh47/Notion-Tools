@@ -2,7 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import { dirname, sep } from "path";
 import { fileURLToPath } from "url";
-import { createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient } from "./notion_api_functions.js";
+import { promises as fs } from 'fs';
+import { createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient, getBlockChildren, extractAcads_and_Semester_PageIDs } from "./notion_api_functions.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -23,11 +24,44 @@ app.use(separatorMiddleware);
 
 app.get("/", (req, res) => {
     console.log("Hello there");
-    res.render("index.ejs");
+    res.render("setup.ejs");
 });
 
 app.get("/add-semester", (req, res) => {
     res.sendFile(__dirname + "/public/add_semester.html");
+});
+
+app.post("/setup", async (req, res) => {
+    console.log("Setup form submitted:", req.body);
+    var secrets = "";
+    var successful;
+    try {
+        const response = await extractAcads_and_Semester_PageIDs(req.body.notionDatabaseLink);
+        successful = true;
+
+        secrets += `\nNOTION_TOKEN=${req.body.notionToken}`;
+        secrets += `\nNOTION_PARENT_LINK=${req.body.notionDatabaseLink}`;
+        secrets += `\nNOTION_ACADS_DATABASE_ID=${response[1]}`;
+        secrets += `\nSEMESTER_VIEW_DATABASE_ID=${response[0]}`;
+        if (req.body.unsplashAccessKey) secrets += `\nUNSPLASH_ACCESS_KEY=${req.body.unsplashAccessKey}`;
+        if (req.body.unsplashSecretKey) secrets += `\nUNSPLASH_SECRET_KEY=${req.body.unsplashSecretKey}`;
+    }
+    catch (error) {
+        console.error('Error during setup:', error);
+        successful = false;
+    }
+    finally {
+        await fs.writeFile('secrets.env', secrets, 'utf8');
+    }
+    
+    if (!successful) {
+        res.status(500).render("setup.ejs", { anchor: "setup-form", isFormSuccessful: false });
+    }
+    else {
+        res.status(200).render("setup.ejs", { anchor: "setup-form", isFormSuccessful: true });
+    }
+    
+    res.redirect("/add-semester");
 });
 
 app.post("/add-semester", async (req, res) => {
