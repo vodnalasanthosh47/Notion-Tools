@@ -20,7 +20,9 @@
     <div class="notion-container">
       <h1 class="notion-title">Welcome to Notion Tools!</h1>
       <p>
-        Your all-in-one solution for managing your Notion databases with ease.
+        First, let us get you all set up. Follow the instructions below to get started.
+        <br>
+        If you are seeing this page even after setting up, something went wrong, please set up again.
       </p>
 
       <div class="notion-card">
@@ -28,7 +30,7 @@
         <hr>
 
         <div class="setup-step">
-          <h3 class="setup-title">Step 1: Duplicate Academic Database Template</h3>
+          <h3 class="setup-title">Step 1: 🔗 Duplicate Academic Database Template</h3>
           <p class="setup-text">
             To get started, duplicate the <a href="https://vodnalasanthosh47.notion.site/Academic-Database-Template-259a748860ab8052835df736bb06e4d6?source=copy_link"> academic database template</a> into your Notion workspace.
             Just follow the link, login, and click on the duplicate icon in the top right corner. Then 
@@ -39,7 +41,7 @@
         </div>
 
         <div class="setup-step">
-          <h3 class="setup-title">Step 2: Setting up a Notion Integration</h3>
+          <h3 class="setup-title">Step 2: ⚙️ Setting up a Notion Integration</h3>
           <p class="setup-text">
             Next, create a Notion integration to allow this app to access your Notion workspace. 
             <ol>
@@ -66,14 +68,14 @@
         </div>
 
         <div class="setup-step" id="setup-form">
-          <h3 class="setup-title">Step 3: Set up environment variables</h3>
+          <h3 class="setup-title">Step 3: 🛠️ Set up environment variables</h3>
           <p class="setup-text">
             Provide the API keys and a link to your Notion Acads Database Template.
             If you are using notion on the browser, you can get the link from the URL bar.
             If you are using the desktop app, right click on the page in the sidebar and click "Copy Link".
           </p>
           
-          <form action="/setup" method="post" class="setup-form">
+          <form action="/setup-form" method="post" class="setup-form">
             <div class="mb-3">
               <label for="notionToken" class="form-label">Notion Integration Token <em style="color: rgb(160, 16, 16);">(Required)</em></label>
               <input type="text" class="form-control" id="notionToken" name="notionToken" required />
@@ -100,14 +102,18 @@
               </div>
             <% } else { %>
             <div class="alert alert-danger setup-form-alert" role="alert">
-                👎 Failed to save API keys. Please check your Notion Database Link and try again.
+                👎 Failed to save API keys. Please check your Notion Database Link or the Notion Integration Key and try again.
               </div>
            <% } %>
            
           <% } %>   
         </div>
-
       </div>
+      <p>
+        Once you have completed these steps, you are ready to use Notion Tools!
+      </p>
+      <button class="btn btn-primary" onclick="window.location.href='/'">Go to Notion Tools</button>
+
   </body>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"

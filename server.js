@@ -3,7 +3,7 @@ import morgan from "morgan";
 import { dirname, sep } from "path";
 import { fileURLToPath } from "url";
 import { promises as fs } from 'fs';
-import { createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient, getBlockChildren, extractAcads_and_Semester_PageIDs } from "./notion_api_functions.js";
+import { checkIfENVIsSetup, createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient, getBlockChildren, extractAcads_and_Semester_PageIDs } from "./notion_api_functions.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -23,15 +23,23 @@ app.use(express.static("public"));
 app.use(separatorMiddleware);
 
 app.get("/", (req, res) => {
-    console.log("Hello there");
-    res.render("setup.ejs");
+    var ENV_Setup = checkIfENVIsSetup();
+    if (!ENV_Setup) {
+        console.log("Environment variables not set up. Redirecting to /setup");
+        res.redirect("/setup");
+    }
+    res.sendFile(__dirname + "/public/home.html");
 });
 
 app.get("/add-semester", (req, res) => {
     res.sendFile(__dirname + "/public/add_semester.html");
 });
 
-app.post("/setup", async (req, res) => {
+app.get("/setup", (req, res) => {
+    res.render("setup.ejs");
+});
+
+app.post("/setup-form", async (req, res) => {
     console.log("Setup form submitted:", req.body);
     var secrets = "";
     var successful;
@@ -64,7 +72,7 @@ app.post("/setup", async (req, res) => {
     res.redirect("/add-semester");
 });
 
-app.post("/add-semester", async (req, res) => {
+app.post("/add-semester-form", async (req, res) => {
     // defining error catching variables
     var semesterAlreadyExists = false;
     var semesterCreated = false;
