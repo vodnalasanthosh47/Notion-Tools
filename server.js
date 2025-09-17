@@ -43,12 +43,16 @@ app.post("/setup-form", async (req, res) => {
     console.log("Setup form submitted:", req.body);
     var secrets = "";
     var successful;
+
+    var initial_secrets = `\nNOTION_TOKEN=${req.body.notionToken}`;
+    initial_secrets += `\nNOTION_PARENT_LINK=${req.body.notionDatabaseLink}`;
+    await fs.writeFile('secrets.env', initial_secrets, 'utf8');
+    
     try {
         const response = await extractAcads_and_Semester_PageIDs(req.body.notionDatabaseLink);
         successful = true;
 
-        secrets += `\nNOTION_TOKEN=${req.body.notionToken}`;
-        secrets += `\nNOTION_PARENT_LINK=${req.body.notionDatabaseLink}`;
+        var secrets = "";
         secrets += `\nNOTION_ACADS_DATABASE_ID=${response[1]}`;
         secrets += `\nSEMESTER_VIEW_DATABASE_ID=${response[0]}`;
         if (req.body.unsplashAccessKey) secrets += `\nUNSPLASH_ACCESS_KEY=${req.body.unsplashAccessKey}`;
