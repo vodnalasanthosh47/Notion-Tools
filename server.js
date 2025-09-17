@@ -47,7 +47,7 @@ app.post("/setup-form", async (req, res) => {
     var initial_secrets = `\nNOTION_TOKEN=${req.body.notionToken}`;
     initial_secrets += `\nNOTION_PARENT_LINK=${req.body.notionDatabaseLink}`;
     await fs.writeFile('secrets.env', initial_secrets, 'utf8');
-    
+    dotenv.config({ path: './secrets.env' });
     try {
         const response = await extractAcads_and_Semester_PageIDs(req.body.notionDatabaseLink);
         successful = true;
@@ -64,6 +64,7 @@ app.post("/setup-form", async (req, res) => {
     }
     finally {
         await fs.writeFile('secrets.env', secrets, 'utf8');
+        dotenv.config({ path: './secrets.env' });
     }
     
     if (!successful) {
