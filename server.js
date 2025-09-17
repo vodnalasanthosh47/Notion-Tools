@@ -109,9 +109,10 @@ app.post("/add-semester-form", async (req, res) => {
     // task 2: create course pages in Notion
     if (req.body.courses !== undefined) {
         console.log(req.body);
-        req.body.courses.forEach(course => {
+        for (const course of req.body.courses) {
             try {
-                var isPageCreated = createCoursePage(req.body.semester, course, notionClient);
+                var isPageCreated = await createCoursePage(req.body.semester, course, notionClient);
+                console.log("isPageCreated:", isPageCreated);
                 if (isPageCreated) {
                     numCoursesAdded++;
                     coursesAdded.push(course.name);
@@ -120,7 +121,7 @@ app.post("/add-semester-form", async (req, res) => {
                 console.error('Error creating course page of ' + course.name + ':', error);
                 errorMessages.push('Error creating course page of ' + course.name + ': ' + error.message);
             }
-        });
+        }
     }
     // task 3: render a confirmation page
     var numCoursesSent = (req.body.courses === undefined) ? 0 : req.body.courses.length;

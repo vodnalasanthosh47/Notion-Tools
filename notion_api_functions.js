@@ -98,7 +98,7 @@ export async function createPage(parentId, isParentADatabase, properties, childr
 
         // creating the page
         const response = await notionClient.pages.create(newPage);
-        console.log("Response from Notion API:", util.inspect(response, { depth: null, colors: true, compact: false }));
+        // console.log("Response from Notion API:", util.inspect(response, { depth: null, colors: true, compact: false }));
         // Need to check if response is 200
         // if (!response || !response.id) {
         //     throw new Error("Failed to create page, response did not contain an ID.");
@@ -161,11 +161,56 @@ export async function createSemesterPage(semesterNumber, courses) {
             }
         };
 
+        const callout_information_text = "This is your Semester " + semesterNumber + " page. You can add more details about this semester here, such as your goals, important dates, or any other information you'd like to keep track of.";
+        const callout_setup_db_text = "Notion API restricts us from creating a linked database of Course Database. \
+                                    Please add the linked database manually by following these steps:\n\
+                                    1. Type into a black space “/data”. Select “Inline Database” option in the dropdown.\n \
+                                    2. In the prompt, select “Link to existing database”\n \
+                                    3. Search for and select your 'Course Database' database. Then select 'New Table view'\n \
+                                    4. In the filtering options, select “Semester” and then select the 'Semester" + semesterNumber + "' option.";
+        var semesterPageChildren = [
+            {
+                "type": "breadcrumb",
+                "breadcrumb": {}
+            },
+            {
+                "type": "callout",
+                "callout": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": callout_information_text
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "type": "callout",
+                "callout": {
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": callout_setup_db_text
+                            }
+                        }
+                    ]
+                },
+                "color": "green_background",
+                "icon": {
+                    "type": "emoji",
+                    "emoji": "⚠️"
+                }
+            }
+        ]
+
         var createPageResponse = await createPage(
             process.env.SEMESTER_VIEW_DATABASE_ID,
             true,
             newSemesterProperties,
-            [],
+            semesterPageChildren,
             await getRandomImage(),
             numberEmojis[semesterNumber]
         );
@@ -182,43 +227,32 @@ export async function createSemesterPage(semesterNumber, courses) {
     }
 }
 
+async function addPropertiesToDatabase(databaseId, properties, notionClient) {
+    try {
+        const response = await notionClient.databases.update({
+            database_id: databaseId,
+            properties: properties,
+        });
+    }
+    catch (error) {
+        console.log('Error adding properties to database:', properties);
+        console.error(error);
+        throw error;
+    }
+}  
+
 async function createResultsDatabase(coursePageId, courseName, notionClient = null) {
     if (!notionClient) {
         notionClient = createNotionClient();
     }
-    try {
-        const resultsEmojis = ["📊", "📈", "📝", "🏅", "🎖️", "🏆", "🧩", "🗂️", "🗃️", "🧭", "*️⃣"];
-        var resultsDatabaseProperties = {
-            "Exam Name": {
-                "title": {},
-            },
-            "Exam Date": {
-                "date": {},
-            },
-            "Score": {
-                "number": {},
-            },
-            "Total Marks": {
-                "number": {},
-            },
-            "Weightage": {
-                "number": {},
-            },
-            "Effective Score": {
-                "formula": {
-                    "expression": "prop('Score') / prop('Total Marks') * prop('Weightage')",
-                }
-            },
-            "Class Average": {
-                "number": {},
-            },
-            "Class Effective Score": {
-                "formula": {
-                    "expression": "prop('Class Average') / prop('Total Marks') * prop('Weightage')"
-                }
-            }
-        };
 
+    const resultsEmojis = ["📊", "📈", "📝", "🏅", "🎖️", "🏆", "🧩", "🗂️", "🗃️", "🧭", "*️⃣"];
+    var resultsDatabaseProperties = {
+        "Exam Name": {
+            "title": {},
+        }
+    };
+    try {
         const resultsDatabaseResponse = await notionClient.databases.create({
             "parent": {
                 "type": "page_id",
@@ -241,9 +275,50 @@ async function createResultsDatabase(coursePageId, courseName, notionClient = nu
             "is_inline": true,
         });
 
+
         if (!resultsDatabaseResponse) {
             throw new Error("Failed to create results database.");
         }
+
+        await addPropertiesToDatabase(resultsDatabaseResponse.id, {
+            "Exam Date": {
+                "date": {},
+            }
+        }, notionClient);
+
+        await addPropertiesToDatabase(resultsDatabaseResponse.id, {
+            "Score": {
+                "number": {},
+            },
+            "Total Marks": {
+                "number": {},
+            }
+        }, notionClient);
+        
+        await addPropertiesToDatabase(resultsDatabaseResponse.id, {
+            "Weightage": {
+                "number": {},
+            }
+        }, notionClient);
+        
+        await addPropertiesToDatabase(resultsDatabaseResponse.id, {
+            "Weighted Score": {
+                "formula": {
+                    "expression": "prop('Score') / prop('Total Marks') * prop('Weightage')",
+                }
+            }
+        }, notionClient);
+        // await addPropertiesToDatabase(resultsDatabaseResponse.id, {
+        //     "Class Average": {
+        //         "number": {},
+        //     },
+        //     "Class Effective Score": {
+        //         "formula": {
+        //             "expression": "prop('Class Average') / prop('Total Marks') * prop('Weightage')"
+        //         }
+        //     }
+        // }, notionClient);
+        
     } catch (error) {
         console.error(`Error creating results database for ${courseName}:`, error);
         throw error;
