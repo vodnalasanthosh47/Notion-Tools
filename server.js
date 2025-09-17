@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import { dirname, sep } from "path";
+import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 import { promises as fs } from 'fs';
 import { checkIfENVIsSetup, createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient, getBlockChildren, extractAcads_and_Semester_PageIDs } from "./notion_api_functions.js";
