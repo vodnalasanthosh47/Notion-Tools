@@ -10,7 +10,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
-const notionClient = createNotionClient();
+if (checkIfENVIsSetup()) {
+    const notionClient = createNotionClient();
+}
+else {
+    const notionClient = null;
+}
 
 function separatorMiddleware(req, res, next) {
     console.log("\n\n----------------------------------------");
@@ -27,7 +32,7 @@ app.get("/", (req, res) => {
     var ENV_Setup = checkIfENVIsSetup();
     if (!ENV_Setup) {
         console.log("Environment variables not set up. Redirecting to /setup");
-        res.redirect("/setup");
+        return res.redirect("/setup");
     }
     res.sendFile(__dirname + "/public/home.html");
 });
@@ -41,41 +46,38 @@ app.get("/setup", (req, res) => {
 });
 
 app.post("/setup-form", async (req, res) => {
-    console.log("Setup form submitted:", req.body);
     var secrets = "";
     var successful;
 
-    var initial_secrets = `\nNOTION_TOKEN=${req.body.notionToken}`;
-    initial_secrets += `\nNOTION_PARENT_LINK=${req.body.notionDatabaseLink}`;
+    var initial_secrets = `\NOTION_API_KEY="${req.body.notionToken}"`;
+    initial_secrets += `\nNOTION_PARENT_LINK="${req.body.notionDatabaseLink}"`;
+    if (req.body.unsplashAccessKey) initial_secrets += `\nUNSPLASH_ACCESS_KEY="${req.body.unsplashAccessKey}"`;
+    if (req.body.unsplashSecretKey) initial_secrets += `\nUNSPLASH_SECRET_KEY="${req.body.unsplashSecretKey}"`;
     await fs.writeFile('secrets.env', initial_secrets, 'utf8');
-    dotenv.config({ path: './secrets.env' });
+    dotenv.config({ path: './secrets.env', override: true });
     try {
         const response = await extractAcads_and_Semester_PageIDs(req.body.notionDatabaseLink);
         successful = true;
 
         var secrets = "";
-        secrets += `\nNOTION_ACADS_DATABASE_ID=${response[1]}`;
-        secrets += `\nSEMESTER_VIEW_DATABASE_ID=${response[0]}`;
-        if (req.body.unsplashAccessKey) secrets += `\nUNSPLASH_ACCESS_KEY=${req.body.unsplashAccessKey}`;
-        if (req.body.unsplashSecretKey) secrets += `\nUNSPLASH_SECRET_KEY=${req.body.unsplashSecretKey}`;
+        secrets += `\nACADS_DATABASE_ID="${response[1]}"`;
+        secrets += `\nSEMESTER_VIEW_DATABASE_ID="${response[0]}"`;
     }
     catch (error) {
         console.error('Error during setup:', error);
         successful = false;
     }
     finally {
-        await fs.writeFile('secrets.env', secrets, 'utf8');
-        dotenv.config({ path: './secrets.env' });
+        await fs.appendFile('secrets.env', secrets, 'utf8');
+        dotenv.config({ path: './secrets.env', override: true });
     }
-    
+
     if (!successful) {
-        res.status(500).render("setup.ejs", { anchor: "setup-form", isFormSuccessful: false });
+        res.render("setup.ejs", { isFormSuccessful: "no" });
     }
     else {
-        res.status(200).render("setup.ejs", { anchor: "setup-form", isFormSuccessful: true });
+        res.render("setup.ejs", { isFormSuccessful: "yes" });
     }
-    
-    res.redirect("/add-semester");
 });
 
 app.post("/add-semester-form", async (req, res) => {

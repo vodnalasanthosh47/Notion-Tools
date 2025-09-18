@@ -94,9 +94,9 @@
             </div>
             <button type="submit" class="btn btn-primary">Save</button>
           </form>
-
+          <br>
           <% if (locals.isFormSuccessful) { %>
-           <% if (isFormSuccessful) { %>
+            <% if (isFormSuccessful === "yes") { %>
               <div class="alert alert-success setup-form-alert" role="alert">
                 ✅ API keys saved successfully!
               </div>
@@ -105,8 +105,8 @@
                 👎 Failed to save API keys. Please check your Notion Database Link or the Notion Integration Key and try again.
               </div>
            <% } %>
-           
-          <% } %>   
+          <% } %>
+
         </div>
       </div>
       <p>

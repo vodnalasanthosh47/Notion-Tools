@@ -25,14 +25,20 @@ export function checkIfENVIsSetup() {
 }
 
 export function createNotionClient() {
-    return new Client({ auth: process.env.NOTION_API_KEY });
+    if (process.env.NOTION_API_KEY) {
+        return new Client({ auth: process.env.NOTION_API_KEY });
+    }
+    else {
+        throw new Error("Cannot create Notion client, environment variables not set up properly.");
+    } 
 }
 
 export async function checkIfSemesterExists(semesterNumber, notionClient = null) {
-    if (!notionClient) {
-        notionClient = createNotionClient();
-    }
     try {
+        if (!notionClient) {
+            notionClient = createNotionClient();
+        }
+
         const response = await notionClient.databases.query({
             database_id: process.env.SEMESTER_VIEW_DATABASE_ID,
             filter: {
@@ -52,10 +58,11 @@ export async function checkIfSemesterExists(semesterNumber, notionClient = null)
 }
 
 export async function createPage(parentId, isParentADatabase, properties, children, coverImageUrl = null, iconEmoji = null, notionClient = null) {
-    if (!notionClient) {
-        notionClient = createNotionClient();
-    }
     try {
+        if (!notionClient) {
+            notionClient = createNotionClient();
+        }
+        
         var newPage = {};
         // adding cover and icon only if they are provided
         if (coverImageUrl) {
@@ -111,8 +118,9 @@ export async function createPage(parentId, isParentADatabase, properties, childr
 }
 
 export async function getBlockChildren(parentId, notionClient = null) {
-    if (!notionClient) notionClient = createNotionClient();
     try {
+        if (!notionClient) notionClient = createNotionClient();
+
         const response = await notionClient.blocks.children.list({
             block_id: parentId,
         });
@@ -124,10 +132,9 @@ export async function getBlockChildren(parentId, notionClient = null) {
 }
 
 export async function appendBlockChildren(blockId, children, notionClient = null) {
-    if (!notionClient) {
-        notionClient = createNotionClient();
-    }
     try {
+        if (!notionClient) notionClient = createNotionClient();
+
         const response = await notionClient.blocks.children.append({
             block_id: blockId,
             children: children,
@@ -229,6 +236,8 @@ export async function createSemesterPage(semesterNumber, courses) {
 
 async function addPropertiesToDatabase(databaseId, properties, notionClient) {
     try {
+        if (!notionClient) notionClient = createNotionClient();
+
         const response = await notionClient.databases.update({
             database_id: databaseId,
             properties: properties,
@@ -242,10 +251,6 @@ async function addPropertiesToDatabase(databaseId, properties, notionClient) {
 }  
 
 async function createResultsDatabase(coursePageId, courseName, notionClient = null) {
-    if (!notionClient) {
-        notionClient = createNotionClient();
-    }
-
     const resultsEmojis = ["📊", "📈", "📝", "🏅", "🎖️", "🏆", "🧩", "🗂️", "🗃️", "🧭", "*️⃣"];
     var resultsDatabaseProperties = {
         "Exam Name": {
@@ -253,6 +258,8 @@ async function createResultsDatabase(coursePageId, courseName, notionClient = nu
         }
     };
     try {
+        if (!notionClient) notionClient = createNotionClient();
+
         const resultsDatabaseResponse = await notionClient.databases.create({
             "parent": {
                 "type": "page_id",
@@ -586,32 +593,31 @@ export async function createCoursePage(semester_num, course) {
     return true;
 }
 
-export async function extractAcads_and_Semester_PageIDs(notion_page_link, notinClient = null) {
+export async function extractAcads_and_Semester_PageIDs(notion_page_link, notionClient = null) {
     var link_split = notion_page_link.split('/');
     var link_split_end = link_split[link_split.length - 1].split('-');
     var parentPageID = link_split_end[link_split_end.length - 1];
 
-    if (!notinClient) notinClient = createNotionClient();
-
     try {
-        const response = await notinClient.blocks.children.list({ block_id: parentPageID });
+        if (!notionClient) notionClient = createNotionClient();
+
+        const response = await notionClient.blocks.children.list({ block_id: parentPageID });
+        var pageIDs = [];
+        response.results.forEach( (object) => {
+            if (object.type === 'child_database') {
+                pageIDs.push(object.id);
+            }
+        });
+
+        // pageIDs length must be 2
+        if (pageIDs.length !== 2) {
+            throw new Error("Expected 2 child database IDs");
+        }
+        return pageIDs;
     } catch (error) {
         console.error("Error fetching child blocks:", error);
         throw new Error("Failed to get database IDs. It might occur if you have provided an invalid Notion page link or you have not given the proper Notion Integration key with proper access.");
     }
-    
-
-    var pageIDs = [];
-    response.results.forEach( (object) => {
-        if (object.type === 'child_database') {
-            pageIDs.push(object.id);
-        }
-    });
-    // pageIDs length must be 2
-    if (pageIDs.length !== 2) {
-        throw new Error("Expected 2 child database IDs");
-    }
-    return pageIDs;
 }
 
 // Testing
