@@ -170,11 +170,11 @@ export async function createSemesterPage(semesterNumber, courses) {
 
         const callout_information_text = "This is your Semester " + semesterNumber + " page. You can add more details about this semester here, such as your goals, important dates, or any other information you'd like to keep track of.";
         const callout_setup_db_text = "Notion API restricts us from creating a linked database of Course Database. \
-                                    Please add the linked database manually by following these steps:\n\
-                                    1. Type into a black space “/data”. Select “Inline Database” option in the dropdown.\n \
-                                    2. In the prompt, select “Link to existing database”\n \
-                                    3. Search for and select your 'Course Database' database. Then select 'New Table view'\n \
-                                    4. In the filtering options, select “Semester” and then select the 'Semester" + semesterNumber + "' option.";
+Please add the linked database manually by following these steps:\n\
+1. Type into a black space “/data”. Select “Inline Database” option in the dropdown.\n \
+2. In the prompt, select “Link to existing database”\n \
+3. Search for and select your 'Course Database' database. Then select 'New Table view'\n \
+4. In the filtering options, select “Semester” and then select the 'Semester" + semesterNumber + "' option.";
         var semesterPageChildren = [
             {
                 "type": "breadcrumb",
@@ -203,13 +203,13 @@ export async function createSemesterPage(semesterNumber, courses) {
                                 "content": callout_setup_db_text
                             }
                         }
-                    ]
+                    ],
+                    "color": "green_background",
+                    "icon": {
+                        "type": "emoji",
+                        "emoji": "⚠️"
+                    }
                 },
-                "color": "green_background",
-                "icon": {
-                    "type": "emoji",
-                    "emoji": "⚠️"
-                }
             }
         ]
 

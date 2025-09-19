@@ -10,11 +10,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const port = 3000;
+var notionClient = null;
 if (checkIfENVIsSetup()) {
-    const notionClient = createNotionClient();
-}
-else {
-    const notionClient = null;
+    notionClient = createNotionClient();
 }
 
 function separatorMiddleware(req, res, next) {
