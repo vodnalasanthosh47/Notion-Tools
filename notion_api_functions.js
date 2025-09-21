@@ -764,8 +764,8 @@ async function updateSemesterPageProperties(semesterWiseData, semesterPageIds, n
 
 
 export async function updateCGPA(notionClient = null) {
-    let totalGPAContribution = 0;
-    let totalCredits = 0;
+    let numberOfSemesters = 0;
+    let aggregateSGPA = 0;
     let cgpa = 0.00;
     try {
         if (!notionClient) notionClient = createNotionClient();
@@ -775,13 +775,22 @@ export async function updateCGPA(notionClient = null) {
         console.log("Retrieved semester-wise GPA contribution data successfully");
         
         for (var semester in semesterWiseData) {
-            totalGPAContribution += semesterWiseData[semester]["gpa contribution"];
-            
-            if (semesterWiseData[semester]["gpa contribution"] > 0) totalCredits += semesterWiseData[semester]["credits"];
+            let sgpa = 0;
+            if (semesterWiseData[semester]["credits"] > 0) {
+                sgpa = semesterWiseData[semester]["gpa contribution"] / semesterWiseData[semester]["credits"];
+                sgpa = Math.floor(sgpa * 100) / 100; // rounding to 2 decimal places
+                semesterWiseData[semester]["sgpa"] = sgpa;
+                aggregateSGPA += sgpa;
+                if (sgpa > 0) numberOfSemesters += 1;    // assuming semesters with 0 SGPA are not counted
+            }
+            else {
+                semesterWiseData[semester]["sgpa"] = 0;
+            }
         }
 
-        if (totalCredits > 0) {
-            cgpa = (totalGPAContribution / totalCredits).toFixed(2);
+        if (numberOfSemesters > 0) {
+            cgpa = (aggregateSGPA / numberOfSemesters);
+            cgpa = Math.floor(cgpa * 100) / 100; // rounding to 2 decimal places
         }
         await updateCGPAQuote(cgpa, notionClient);
         console.log(`Updated CGPA Quote Successfully.`);
