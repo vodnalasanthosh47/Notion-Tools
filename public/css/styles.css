@@ -151,3 +151,12 @@ a:hover {
 hr {
   margin-bottom: 24px;
 }
+.back-link {
+  color: #505050;
+}
+.back-link:hover {
+  text-decoration: none;
+}
+.back-paragraph {
+  margin-bottom: 24px;
+}
