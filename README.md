@@ -1,5 +1,5 @@
-# Notion-Tools
-Notion-Tools is a web application designed to optimize your academic workflow in Notion by leveraging the Notion API. It provides a streamlined setup process, automation for semester and course management. Many features are currently being developed, like results tracking, calendar management, and cgpa calculation. 
+# Notion-Tools v2
+Notion-Tools is a web application designed to optimize your academic workflow in Notion by leveraging the Notion API. It provides a streamlined setup process, automation for semester and course management, and automatic cgpa calculator. Many features are currently being developed, like results tracking and calendar management. 
 
 ## Table of Contents
 - [💡 The Idea](#-the-idea)
@@ -36,6 +36,12 @@ Usage:
 5. Visit `http://localhost:3000` in your browser.
 
 ## 🚀 Features
+
+- **Automatic CGPA Calculator (new v2 feature)**
+
+  - Calculates overall CGPA and semester-wise GPA for all semesters in the Notion database.
+  - Displays the calculated CGPA and GPA on a dedicated page.
+  - Updates the data into the Notion database.
 
 - **Automated Semester & Course Management**
 
@@ -78,22 +84,24 @@ This information is presented to you once youu visit the app for the first time 
 Notion-Tools/
 ├── notion_api_functions.js         # Notion API integration and utility functions
 ├── unsplash_api_functions.js       # Unsplash API integration functions
-├── server.js                      # Express server and route handlers
-├── package.json                   # Project dependencies and scripts
-├── secrets.env                    # Environment variables (API keys, database links)
-├── README.md                      # Project documentation
+├── server.js                       # Express server and route handlers
+├── package.json                    # Project dependencies and scripts
+├── secrets.env                     # Environment variables (API keys, database links)
+├── README.md                       # Project documentation
 ├── public/
-│   ├── add_semester.html          # Add semester page
-│   ├── home.html                  # Home page
+│   ├── add_semester.html           # Add semester page
+│   ├── home.html                   # Home page
 │   ├── css/
-│   │   └── styles.css             # Main stylesheet
-│   ├── images/                    # Setup and feature images
+│   │   └── styles.css              # Main stylesheet
+│   ├── images/                     # Setup and feature images
 │   └── js/
-│       ├── add_semester_script.js # JS for add semester page
-│       └── welcome_script.js      # JS for home/setup page
+│       ├── add_semester_script.js  # JS for add semester page
+│       └── welcome_script.js       # JS for home/setup page
 ├── views/
-│   ├── added_semester.ejs         # Confirmation page after adding semester
-│   └── setup.ejs                  # Setup instructions and form
+│   ├── added_semester.ejs          # Confirmation page after adding semester
+│   └── setup.ejs                   # Setup instructions and form
+│   └── calculate_cgpa.ejs          # CGPA calculation page
+└── .gitignore                      # Files to ignore in git
 ```
 
 
@@ -105,6 +113,9 @@ NOTION_API_KEY= "Notion-Integration-Key"
 NOTION_PARENT_LINK= "Notion-Acadamic-Database-URL"
 ACADS_DATABASE_ID= "Notion-Courses-Database-ID"
 SEMESTER_VIEW_DATABASE_ID= "Notion-Semesters-Database-ID"
+CGPA_QUOTE_PAGE_ID= "Notion-Block-ID-for-CGPA-Quote"
+UNSPLASH_ACCESS_KEY= "Unsplash-API-Access-Key"    # optional
+UNSPLASH_SECRET_KEY= "Unsplash-API-Secret-Key"    # optional
 ```
 
 ## 💡 Contributing
