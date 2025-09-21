@@ -776,7 +776,8 @@ export async function updateCGPA(notionClient = null) {
         
         for (var semester in semesterWiseData) {
             totalGPAContribution += semesterWiseData[semester]["gpa contribution"];
-            totalCredits += semesterWiseData[semester]["credits"];
+            
+            if (semesterWiseData[semester]["gpa contribution"] > 0) totalCredits += semesterWiseData[semester]["credits"];
         }
 
         if (totalCredits > 0) {
@@ -787,6 +788,7 @@ export async function updateCGPA(notionClient = null) {
 
         // update the semester view database's properties too
         updateSemesterPageProperties(semesterWiseData, semesterPageIds, notionClient);
+        return {overallCGPA: Number(cgpa), semesterWideData: semesterWiseData};
     } catch (error) {
         console.error("Error updating CGPA:", error);
     }

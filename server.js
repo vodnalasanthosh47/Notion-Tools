@@ -4,7 +4,7 @@ import { dirname, sep } from "path";
 import dotenv from 'dotenv';
 import { fileURLToPath } from "url";
 import { promises as fs } from 'fs';
-import { checkIfENVIsSetup, createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient, getBlockChildren, extractAcads_and_Semester_PageIDs } from "./notion_api_functions.js";
+import { checkIfENVIsSetup, createSemesterPage, createCoursePage, checkIfSemesterExists, createNotionClient, getBlockChildren, extractAcads_and_Semester_PageIDs, updateCGPA } from "./notion_api_functions.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -139,6 +139,15 @@ app.post("/add-semester-form", async (req, res) => {
                  coursesAdded: coursesAdded,
                  errorMessage: errorMessages.join(';\n')
                 });
+});
+
+app.get("/calculate-cgpa", async (req, res) => {
+    res.render("calculated_cgpa.ejs");
+});
+
+app.post("/calculate-cgpa", async (req, res) => {
+    let { overallCGPA, semesterWideData } = await updateCGPA(notionClient);
+    res.render("calculated_cgpa.ejs", { overallCGPA: overallCGPA, semesterWideData: semesterWideData });
 });
 
 app.listen(port, () => {
