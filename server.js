@@ -147,6 +147,8 @@ app.get("/calculate-cgpa", async (req, res) => {
 
 app.post("/calculate-cgpa", async (req, res) => {
     let { overallCGPA, semesterWideData } = await updateCGPA(notionClient);
+    console.log("overallCGPA:", overallCGPA);
+    console.log("semesterWideData:", semesterWideData);
     res.render("calculated_cgpa.ejs", { overallCGPA: overallCGPA, semesterWideData: semesterWideData });
 });
 

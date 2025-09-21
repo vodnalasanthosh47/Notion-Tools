@@ -17,7 +17,9 @@
 </head>
 
 <body>
+
   <div class="notion-container">
+
     <% if (locals.overallCGPA) { %>
         <h1 class="notion-title">🎉 Calculated CGPA</h1>
     <% } else { %>
@@ -29,6 +31,7 @@
             Calculate CGPA & SGPAs
         </button>
     </form>
+    <br> <br>
 
     <% if (locals.overallCGPA) { %>
         <div class="notion-card">
@@ -39,27 +42,27 @@
     <% } %>
 
     <% if (locals.semesterWideData) { %>
-        <% for( let index = 0; index < semesterWideData.length; index++ ) { %>
+        <% for( var semester in semesterWideData ) { %>
             <div class="notion-card">
                 <h3 class="section-title">
-                    📚 <%= semesterWideData[index]["semester"] %>
+                    📚 <%= semester %>
                 </h3>
                 <ul class="list-group">
                     <li class="list-group-item">
-                        <i class="fas fa-check me-2"></i>
-                        Credits: <%= semesterWideData[index]["credits"] %>
+                        <i class="fa-regular fa-gem me-2"></i>
+                        Credits: <%= semesterWideData[semester]["credits"] %>
                     </li>
                     <li class="list-group-item">
-                        <i class="fas fa-check me-2"></i>
-                        # Courses: <%= semesterWideData[index]["# courses"] %>
+                        <i class="fa-regular fa-rectangle-list me-2"></i>
+                        # Courses: <%= semesterWideData[semester]["# courses"] %>
                     </li>
                     <li class="list-group-item">
-                        <i class="fas fa-check me-2"></i>
-                        GPA Contribution: <%= semesterWideData[index]["gpa contribution"].toFixed(2) %>
+                        <i class="fa-regular fa-note-sticky me-2"></i>
+                        GPA Contribution: <%= semesterWideData[semester]["gpa contribution"].toFixed(2) %>
                     </li>
                     <li class="list-group-item">
-                        <i class="fas fa-check me-2"></i>
-                        SGPA: <%= semesterWideData[index]["gpa contribution"] / semesterWideData[index]["credits"] %>
+                        <i class="fa-regular fa-hand-point-right me-2"></i>
+                        SGPA: <%= semesterWideData[semester]["gpa contribution"] / semesterWideData[semester]["credits"] %>
                     </li>
                 </ul>
             </div>
