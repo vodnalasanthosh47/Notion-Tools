@@ -5,6 +5,8 @@ import util from 'util';
 import {getRandomImage} from './unsplash_api_functions.js';
 import { type } from 'os';
 import { get } from 'http';
+import moment from 'moment';
+import { promises as fs } from 'fs';
 
 const mainPageImage_URL = "https://images.unsplash.com/photo-1504805572947-34fad45aed93?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
@@ -620,4 +622,187 @@ export async function extractAcads_and_Semester_PageIDs(notion_page_link, notion
     }
 }
 
+async function getSemesterWiseGPAContribution(notionClient = null) {
+    // returns an object mapping semester numbers to their total GPA contributions
+    // {"Semester 1": {"gpa constribution": 66.6, "credits": 18, "# courses": 6 }, ...}
+    var semesterWiseGPAData = {};
+    try {
+        if (!notionClient) notionClient = createNotionClient();
+
+        const courses = await notionClient.databases.query({
+            database_id: process.env.ACADS_DATABASE_ID,
+            page_size: 100,
+        });
+        courses.results.forEach( (course) => {
+            var semester = course.properties['Semester'].select.name;
+            var gpaContribution = course.properties['GPA Contribution'].formula.number || 0;
+            var credits = course.properties['# of Credits'].number || 0;
+
+            if (!semesterWiseGPAData[semester]) {
+                // if semester not already present, initialize it
+                semesterWiseGPAData[semester] = {
+                    "gpa contribution": 0,
+                    "credits": 0,
+                    "# courses": 0
+                };
+            }
+            semesterWiseGPAData[semester]["gpa contribution"] += gpaContribution;
+            semesterWiseGPAData[semester]["credits"] += credits;
+            semesterWiseGPAData[semester]["# courses"] += 1;
+        });
+    } catch (error) {
+        console.error("Error fetching semester-wise GPA contribution:", error);
+    }
+    return semesterWiseGPAData;
+}
+
+async function updateCGPAQuote(cgpa, notionClient = null) {
+    try {
+        if (!notionClient) notionClient = createNotionClient();
+
+        if (!process.env.CGPA_QUOTE_PAGE_ID) {
+            var link_split = process.env.NOTION_PARENT_LINK.split('/');
+            var link_split_end = link_split[link_split.length - 1].split('-');
+            var parentPageID = link_split_end[link_split_end.length - 1];
+            const response = await notionClient.blocks.children.list({ block_id: parentPageID });
+            let quote_page_id;
+            for (var object of response.results) {
+                if (object.type === 'quote') {
+                    quote_page_id = object.id;
+                    break;
+                }
+            }
+
+            if (!quote_page_id) {
+                throw new Error("No quote block found in the main page to update CGPA.");
+            }
+
+            process.env.CGPA_QUOTE_PAGE_ID = quote_page_id;
+            fs.appendFile('secrets.env', `\nCGPA_QUOTE_PAGE_ID="${quote_page_id}"`, 'utf8');
+        }
+
+        // updating the quote block now
+        const response = await notionClient.blocks.update({
+            block_id: process.env.CGPA_QUOTE_PAGE_ID,
+            quote: {
+                rich_text: [
+                    {
+                        type: "text",
+                        text: {
+                            content: `Overall CGPA: ${cgpa}/4.00\n~Up to date as of: ${moment().format("MMMM Do YYYY, h:m A")}`
+                        }
+                    }
+                ]
+            }
+        });
+    } catch (error) {
+        console.error("Error updating CGPA quote:", error);
+    }
+}
+
+async function getSemesterPageIds(notionClient = null) {
+    var semesterPageIds = {};
+    try {
+        if (!notionClient) notionClient = createNotionClient();
+
+        const semester_pages_response = await notionClient.databases.query({
+            database_id: process.env.SEMESTER_VIEW_DATABASE_ID,
+            page_size: 100,
+        });
+        console.log(util.inspect(semester_pages_response.results[0], { depth: null, colors: true, compact: false }));
+        semester_pages_response.results.forEach( (semester_page) => {
+            semesterPageIds[semester_page.properties['Semester'].title[0].plain_text] = semester_page.id;
+        })
+    }
+    catch (error) {
+        console.error("Error fetching semester page IDs:", error);
+    }
+    return semesterPageIds;
+}
+
+async function updateSemesterPageProperties(semesterWiseData, semesterPageIds, notionClient = null) {
+    try {
+        if (!notionClient) notionClient = createNotionClient();
+    }
+    catch (error) {
+        console.error("Unable to create notion Client for updating Semester Page Properties", error);
+        return;
+    }
+
+    for (var semester in semesterPageIds) {
+        console.log(semester);
+        if (!semesterWiseData[semester]) {
+            console.log("In here")
+            semesterWiseData[semester] = {
+                "gpa contribution": 0,
+                "credits": 0,
+                "# courses": 0
+            };
+        }
+
+        try {
+            await notionClient.pages.update({
+                page_id: semesterPageIds[semester],
+                properties: {
+                    'Credits': {
+                        "number": semesterWiseData[semester]["credits"],
+                    },
+                    'Number of Courses': {
+                        "number": semesterWiseData[semester]["# courses"],
+                    },
+                    'GPA Contribution': {
+                        "number": Number(semesterWiseData[semester]["gpa contribution"].toFixed(2)),
+                    }
+                }
+            });
+        }
+        catch (error) {
+            console.error(`Error updating properties for ${semester}:`, error);
+        }
+    }
+}
+
+
+export async function updateCGPA(notionClient = null) {
+    let totalGPAContribution = 0;
+    let totalCredits = 0;
+    let cgpa = 0.00;
+    try {
+        if (!notionClient) notionClient = createNotionClient();
+
+        let semesterWiseData = await getSemesterWiseGPAContribution(notionClient);
+        let semesterPageIds = await getSemesterPageIds(notionClient);
+        console.log("Retrieved semester-wise GPA contribution data successfully");
+        
+        for (var semester in semesterWiseData) {
+            totalGPAContribution += semesterWiseData[semester]["gpa contribution"];
+            totalCredits += semesterWiseData[semester]["credits"];
+        }
+
+        if (totalCredits > 0) {
+            cgpa = (totalGPAContribution / totalCredits).toFixed(2);
+        }
+        await updateCGPAQuote(cgpa, notionClient);
+        console.log(`Updated CGPA Quote Successfully.`);
+
+        // update the semester view database's properties too
+        updateSemesterPageProperties(semesterWiseData, semesterPageIds, notionClient);
+    } catch (error) {
+        console.error("Error updating CGPA:", error);
+    }
+}
+
 // Testing
+// const notionClient = createNotionClient();
+// // I want a list of all pages in the Acads database
+// const results = await notionClient.databases.query({database_id: process.env.ACADS_DATABASE_ID, page_size: 100});
+// var course = results.results[0];
+// // console.log(util.inspect(results.results[0], { depth: null, colors: true, compact: false }));
+
+// console.log("Credits: " + course.properties['# of Credits'].number);
+// console.log("\nSemester: " + course.properties['Semester'].select.name);
+// console.log("\nGPA Contribution: " + course.properties['GPA Contribution'].formula.number);
+
+// var data = getSemesterWiseGPAContribution();
+// console.log(util.inspect(await data, { depth: null, colors: true, compact: false }));
+
